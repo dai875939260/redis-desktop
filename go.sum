@@ -1,0 +1,8 @@
+github.com/gomodule/redigo v2.0.0+incompatible h1:K/R+8tc58AaqLkqG2Ol3Qk+DR/TlNuhuh457pBFPtt0=
+github.com/gomodule/redigo v2.0.0+incompatible/go.mod h1:B4C85qUVwatsJoIUNIfCRsp7qO0iAmpGFZ4EELWSbC4=
+github.com/schollz/jsonstore v1.1.0 h1:WZBDjgezFS34CHI+myb4s8GGpir3UMpy7vWoCeO0n6E=
+github.com/schollz/jsonstore v1.1.0/go.mod h1:15c6+9guw8vDRyozGjN3FoILt0wpruJk9Pi66vjaZfg=
+github.com/zserge/lorca v0.1.6 h1:+vPEY29oMLZK34lvRVM+OBytJK3hMQTGaeLsGym240c=
+github.com/zserge/lorca v0.1.6/go.mod h1:gTrVdXKyWxNhc8aUb1Uu3s0mY343arR1T6jUtxmBxR8=
+golang.org/x/net v0.0.0-20181102091132-c10e9556a7bc h1:ZMCWScCvS2fUVFw8LOpxyUUW5qiviqr4Dg5NdjLeiLU=
+golang.org/x/net v0.0.0-20181102091132-c10e9556a7bc/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
