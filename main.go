@@ -5,19 +5,19 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/gomodule/redigo/redis"
+	"github.com/schollz/jsonstore"
+	"github.com/zserge/lorca"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
-	redis2 "redis-client/redis"
 	"runtime"
 	"strconv"
 	"strings"
 
-	"github.com/gomodule/redigo/redis"
-	"github.com/schollz/jsonstore"
-	"github.com/zserge/lorca"
+	redis2 "redis-client/redis"
 )
 
 type RedisPool struct {
@@ -34,6 +34,12 @@ type RedisProp struct {
 	Host     string
 	Port     int
 	Password string
+}
+
+type RedisStoreData struct {
+	KeyType string   `json:"keyType"`
+	Ttl     string   `json:"ttl"`
+	Value   []string `json:"value"`
 }
 
 var ks = new(jsonstore.JSONStore)
@@ -112,31 +118,45 @@ func (r *RedisPools) selectDb(name string, db int) []string {
 	return arr
 }
 
-func (r *RedisPools) valueByKey(name string, db int, key string) []string {
+func (r *RedisPools) valueByKey(name string, db int, key string) RedisStoreData {
 	pool := selectPool(r, name)
 	if pool == nil {
 		log.Println("pool init fail")
-		return nil
+		return *&RedisStoreData{Value: nil}
 	}
 	c := pool.Get()
 	keyType := redis2.TypeKey(pool, key)
 	log.Println("keyType:", keyType)
-	if keyType == "hash" {
-		log.Println(redis2.HScan(pool, key))
+	switch keyType {
+	case "hash":
 		result, err := redis2.HScan(pool, key)
 		if err != nil {
-			return nil
+			return *&RedisStoreData{Value: nil}
 		}
-		return result
+		return *&RedisStoreData{
+			KeyType: "HASH",
+			Value:   result,
+		}
+		break
+	case "list":
+		result, err := redis2.LRange(pool, key, 0, 999)
+		if err != nil {
+			return *&RedisStoreData{Value: nil}
+		}
+		return *&RedisStoreData{
+			KeyType: "LIST",
+			Value:   result,
+		}
+		break
 	}
 	arr, err1 := redis2.Get(pool, key)
 	log.Println("get:", arr)
 	if err1 != nil {
 		log.Println("Get failed:", err1)
-		return nil
+		return *&RedisStoreData{Value: nil}
 	}
 	defer c.Close()
-	return nil
+	return *&RedisStoreData{Value: nil}
 }
 
 func main() {
@@ -173,15 +193,10 @@ func main() {
 	defer ln.Close()
 	go http.Serve(ln, http.FileServer(FS))
 	if *env == "dev" {
-		ui.Load("http://localhost:8080")
+		ui.Load("http://localhost:3000")
 	} else {
 		ui.Load(fmt.Sprintf("http://%s", ln.Addr()))
 	}
-
-	ui.Eval(`
-		console.log("Hello, world!");
-		console.log('Multiple values:', [1, false, {"x":5}]);
-	`)
 
 	// Wait until the interrupt signal arrives or browser window is closed
 	sigc := make(chan os.Signal)

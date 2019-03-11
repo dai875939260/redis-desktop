@@ -1,0 +1,7 @@
+@import '~antd/dist/antd.css';
+
+.key-info span,
+.key-info button,
+.key-info input {
+  margin-left: 10px;
+}

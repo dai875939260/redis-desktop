@@ -40,6 +40,17 @@ func HScan(p *redis.Pool, key string) ([]string, error) {
 	return parseScanResults(data)
 }
 
+func LRange(p *redis.Pool, key string, start, stop int) ([]string, error) {
+	conn := p.Get()
+	defer conn.Close()
+	data, err := redis.Values(conn.Do("LRANGE", key, "0", "999"))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return parseScanResults(data)
+}
+
 func parseScanResults(results []interface{}) ([]string, error) {
 	if len(results) != 2 {
 		return []string{}, nil
