@@ -6,7 +6,7 @@
 
         cd front
         yarn install
-        yarn serve
+        yarn start
 
 - start
 
